@@ -80,14 +80,55 @@ function drawBricks() {
   });
 }
 
+function movePaddle() {
+  paddleProps.x += paddleProps.dx;
+
+  if (paddleProps.x + paddleProps.w > canvas.width) {
+    paddleProps.x = canvas.width - paddleProps.w;
+  }
+
+  if (paddleProps.x < 0) paddleProps.x = 0;
+}
+
+function keyDown(e) {
+  if (e.key === 'Right' || e.key === 'ArrowRight') {
+    paddleProps.dx = paddleProps.speed;
+  } else if (e.key === 'Left' || e.key === 'ArrowLeft') {
+    paddleProps.dx = -paddleProps.speed;
+  }
+}
+
+function keyup(e) {
+  if (
+    e.key === 'Right' ||
+    e.key === 'ArrowRight' ||
+    e.key === 'Left' ||
+    e.key === 'ArrowLeft'
+  ) {
+    paddleProps.dx = 0;
+  }
+}
+
 function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   drawBall();
   drawPaddle();
   drawScore();
   drawBricks();
 }
 
-draw();
+function update() {
+  movePaddle();
+  draw();
+  requestAnimationFrame(update);
+}
+
+update();
+
+
+document.addEventListener('keydown', keyDown);
+document.addEventListener('keyup', keyup);
 
 rulesBtn.addEventListener('click', () => {
   rules.classList.add('show');
