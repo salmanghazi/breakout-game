@@ -90,6 +90,45 @@ function movePaddle() {
   if (paddleProps.x < 0) paddleProps.x = 0;
 }
 
+function moveBall() {
+  ballProps.x += ballProps.dx;
+  ballProps.y += ballProps.dy;
+
+  // Wall collision (right/left)
+  if (ballProps.x + ballProps.size > canvas.width || ballProps.x - ballProps.size < 0) {
+    ballProps.dx *= -1; // ballProps.dx = ballProps.dx * -1
+  }
+
+  // Wall collision (top/bottom)
+  if (ballProps.y + ballProps.size > canvas.height || ballProps.y - ballProps.size < 0) {
+    ballProps.dy *= -1;
+  }
+
+  if (
+    ballProps.x - ballProps.size > paddleProps.x &&
+    ballProps.x + ballProps.size < paddleProps.x + paddleProps.w &&
+    ballProps.y + ballProps.size > paddleProps.y
+  ) {
+    ballProps.dy = -ballProps.speed;
+  }
+
+  bricks.forEach(column => {
+    column.forEach(brick => {
+      if (brick.visible) {
+        if (
+          ballProps.x - ballProps.size > brick.x &&
+          ballProps.x + ballProps.size < brick.x + brick.w &&
+          ballProps.y + ballProps.size > brick.y &&
+          ballProps.y - ballProps.size < brick.y + brick.h
+        ) {
+          ballProps.dy *= -1;
+          brick.visible = false;
+        }
+      }
+    });
+  });
+}
+
 function keyDown(e) {
   if (e.key === 'Right' || e.key === 'ArrowRight') {
     paddleProps.dx = paddleProps.speed;
@@ -120,6 +159,7 @@ function draw() {
 
 function update() {
   movePaddle();
+  moveBall();
   draw();
   requestAnimationFrame(update);
 }
